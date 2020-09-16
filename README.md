@@ -7,7 +7,7 @@ change security group for inbound and outbound traffic
 
 ssh -i ~/Downloads/pemfile.pem ubuntu@ec2-3-235-41-19.compute-1.amazonaws.com
 
-scp -i ~/Downloads/pemfile.pem -r /home/avadadpal/PhD/Pirsona  ubuntu@ec2-34-215-118-237.us-west-2.compute.amazonaws.com:
+scp -i ~/Downloads/pemfile.pem -r ~/Pirsona  ubuntu@ec2-34-215-118-237.us-west-2.compute.amazonaws.com:
 
 sudo apt-get install make
 
