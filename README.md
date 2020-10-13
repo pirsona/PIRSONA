@@ -1,6 +1,8 @@
 # PIRSONA
 4 Party- MPC based secure Recommender System
 
+To run this, Boost ASIO must be installed
+
 chmod 400 ~/Downloads/pemfile.pem
 
 change security group for inbound and outbound traffic
