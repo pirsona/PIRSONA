@@ -5,10 +5,12 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <fstream>
-#include <boost/asio.hpp>
-#include <mutex>
-#include <boost/lexical_cast.hpp>
  
+#include <mutex>
+#include <boost/bind.hpp>
+#include <boost/asio.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/asio/ssl.hpp>
 #include "datatypes.h"
 #include "network.h"
  
@@ -19,8 +21,12 @@
 
 
 
-
+using ssl_socket = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
 using boost::asio::ip::tcp;
+ 
+namespace ssl = boost::asio::ssl;
+typedef ssl::stream<tcp::socket> ssl_socket;
+ boost::asio::ssl::context ssl_context(boost::asio::ssl::context::tls); 
 using namespace std::chrono;
 
 auto start_of_program = std::chrono::system_clock::now();
@@ -123,7 +129,7 @@ void keep_polling(boost::asio::io_context& io_context)
 
 
 
-void read_sanity_beavers(tcp::socket & sin)
+void read_sanity_beavers(ssl_socket & sin)
 {
   bvr2_sanity = (beaver2_sanity *) std::aligned_alloc(sizeof(__m256i), nqueries * sizeof(beaver2_sanity));
 
@@ -134,7 +140,7 @@ void read_sanity_beavers(tcp::socket & sin)
   }
 }
 
-void read_beavers(AES_KEY &key, boost::asio::io_context & io_context, tcp::socket& seed_sin, tcp::socket & sin)
+void read_beavers(AES_KEY &key, boost::asio::io_context & io_context, ssl_socket& seed_sin, ssl_socket & sin)
 {
 
   bvr  = (beaver1 *) std::aligned_alloc(sizeof(__m256i), nqueries * sizeof(beaver1));
@@ -142,8 +148,8 @@ void read_beavers(AES_KEY &key, boost::asio::io_context & io_context, tcp::socke
   bvr2 = (beaver2 *) std::aligned_alloc(sizeof(__m256i), nqueries * sizeof(beaver2));
  
   __m128i seed;
-
-  read(seed_sin, boost::asio::buffer(&seed, sizeof(__m128i)));
+  boost::system::error_code ec;  
+  boost::asio::read(seed_sin, boost::asio::buffer(&seed, sizeof(__m128i)), ec);
 
   
   #if(PARTY == 1)
@@ -209,19 +215,6 @@ void update_progress2()
   }
 } 
 
-void read_profiles(tcp::socket & sin)
-{
-  
-  blinded_profile = (blind_vecs *) std::aligned_alloc(sizeof(__m256i),  nqueries * sizeof(blind_vecs));
-
-  for (size_t i = 0; i < nqueries; ++i)
-  {     
-     read(sin, boost::asio::buffer(&blinded_profile[i], blind_vecs::size));
- 
-     progress[step::profiles_in] = i + 1;
-  }
-}
-
 void blind_profiles()
 { 
   blinds = (blind_vecs *)std::aligned_alloc(sizeof(__m256i), nqueries * sizeof(blind_vecs));
@@ -233,6 +226,9 @@ void blind_profiles()
            progress[step::itm_mux_out] < i + 1  
            ) 
       { 
+
+
+        //std::cout  << "blinded_profiles: " << progress[step::bvr2_in] << " " << progress[step::itm_mux_out] << std::endl;
         std::this_thread::yield(); 
       }
 
@@ -252,10 +248,21 @@ void blind_profiles()
 }
 
 
+void read_profiles(ssl_socket & sin)
+{
+  
+  blinded_profile = (blind_vecs *) std::aligned_alloc(sizeof(__m256i),  nqueries * sizeof(blind_vecs));
 
+  for (size_t i = 0; i < nqueries; ++i)
+  {   
+     boost::system::error_code ec;  
+     boost::asio::read(sin, boost::asio::buffer(&blinded_profile[i], blind_vecs::size), ec);
+ 
+     progress[step::profiles_in] = i + 1;
+  }
+}
 
-
- void write_blinded_profiles(const size_t i, boost::asio::io_context& io_context, tcp::socket& sout)
+ void write_blinded_profiles(const size_t i, boost::asio::io_context& io_context, ssl_socket& sout)
  {
 
       while(progress[step::profiles_gen] < i + 1)
@@ -284,15 +291,15 @@ void blind_profiles()
  }
 
 
-void read_norms(boost::asio::io_context & io_context, tcp::socket & sin)
+void read_norms(boost::asio::io_context & io_context, ssl_socket & sin)
 {
 
   blinded_norm = (fixed_t<2*precision>*)std::aligned_alloc(sizeof(__m256i), nqueries * sizeof(fixed_t<2*precision>));
  
   for (size_t i = 0; i < nqueries; ++i)
   {   
-    
-    read(sin, boost::asio::buffer(&blinded_norm[i], sizeof(fixed_t<2*precision>)));
+    boost::system::error_code ec; 
+    boost::asio::read(sin, boost::asio::buffer(&blinded_norm[i], sizeof(fixed_t<2*precision>)), ec);
     
     progress[step::norms_in] = i + 1;
 
@@ -300,7 +307,7 @@ void read_norms(boost::asio::io_context & io_context, tcp::socket & sin)
 
 }
 
- void write_blinded_norms(const size_t i, boost::asio::io_context& io_context, tcp::socket& sout)
+ void write_blinded_norms(const size_t i, boost::asio::io_context& io_context, ssl_socket& sout)
  {
 
     while(progress[step::norms_gen] < i + 1)
@@ -337,7 +344,7 @@ void generate_norms()
     std::cout << i << "--> gen_norms" << std::endl;
     while (progress[step::profiles_in] < i + 1 || progress[step::profiles_gen] < i + 1) 
     { 
-      //std::cout << "9\n"; 
+     // std::cout << "9"   << progress[step::profiles_in] << " " << progress[step::profiles_gen] << "\n"; 
       std::this_thread::yield(); 
     }
     
@@ -361,16 +368,15 @@ void generate_norms()
 
 
 
-void read_cws(boost::asio::io_context & io_context, tcp::socket & sin)
+void read_cws(boost::asio::io_context & io_context, ssl_socket & sin)
 {
 
-
   final_cw = (profile<3 * precision> *)std::aligned_alloc(sizeof(__m256i), nqueries * sizeof(profile<3 * precision>));
-
  
   for (size_t i = 0; i < nqueries; ++i)
   {
-    read(sin, boost::asio::buffer(&final_cw[i], sizeof(profile<3*precision>)));
+    boost::system::error_code ec; 
+    boost::asio::read(sin, boost::asio::buffer(&final_cw[i], sizeof(profile<3*precision>)), ec);
 
     progress[step::cws_in] = i + 1;
   }
@@ -393,9 +399,6 @@ void generate_cws()
            ) 
     {
       //std::cout << "10\n"; 
-
- 
-
      std::this_thread::yield(); 
     }
 
@@ -416,7 +419,7 @@ void generate_cws()
 }
 
 
- void write_cws(const size_t i, boost::asio::io_context& io_context, tcp::socket& sout)
+ void write_cws(const size_t i, boost::asio::io_context& io_context, ssl_socket & sout)
  {
 
       while(progress[step::cws_gen] < i + 1)
@@ -486,7 +489,7 @@ void update_uprofiles()
     }
     else
     {
-     std::cerr << "uprofile update skipped: " << i << " -> " << sanity_vector_mux[i] << " " << sanity_vector_demux[i] << std::endl;
+     std::cerr << "uprofile update skipped: " << i << " -> " << (int)sanity_vector_mux[i] << " " << (int)sanity_vector_demux[i] << std::endl;
     }
     
     progress[step::user_update] = 0;
@@ -515,7 +518,7 @@ void update_uprofiles()
 
 }
 
-
+/* THIS FUNCTION IS ONLY FOR DEBUGGING */
 void write_iprofiles(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
 {
   while(progress[step::item_update] < nqueries || progress[step::offset_iprofiles] < total_bucket_elements)
@@ -549,6 +552,9 @@ void write_iprofiles(size_t j, boost::asio::io_context& io_context, tcp::socket&
 
 }
 
+
+
+/* THIS FUNCTION IS ONLY FOR DEBUGGING */
 void reconstruct_iprofiles(tcp::socket& sin)
 {
 
@@ -563,7 +569,7 @@ void reconstruct_iprofiles(tcp::socket& sin)
       std::this_thread::yield();
     }
    
-    read(sin, boost::asio::buffer(&iprofiles_reconstructed[i], sizeof(profile<3 * (precision/2)>)));
+    boost::asio::read(sin, boost::asio::buffer(&iprofiles_reconstructed[i], sizeof(profile<3 * (precision/2)>)));
     
     iprofiles_reconstructed[i] += iprofiles_reduced[i];
     
@@ -575,6 +581,8 @@ void reconstruct_iprofiles(tcp::socket& sin)
   progress[step::item_reconstructed] = nitems;
 }
 
+
+/* THIS FUNCTION IS ONLY FOR DEBUGGING */
 void write_uprofiles(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
 {
     while(progress[step::user_update] < nqueries || progress[step::offset_uprofiles] < nusers)
@@ -606,6 +614,7 @@ void write_uprofiles(size_t j, boost::asio::io_context& io_context, tcp::socket&
    progress[step::uprofile_out] = j + 1;
 }
 
+/* THIS FUNCTION IS ONLY FOR DEBUGGING */
 void reconstruct_uprofiles(tcp::socket& sin)
 {
 
@@ -619,7 +628,7 @@ void reconstruct_uprofiles(tcp::socket& sin)
       std::this_thread::yield();
     }
  
-    read(sin, boost::asio::buffer(&uprofiles_reconstructed[i], sizeof(profile<3 * (precision/2)>)));
+    boost::asio::read(sin, boost::asio::buffer(&uprofiles_reconstructed[i], sizeof(profile<3 * (precision/2)>)));
     uprofiles_reconstructed[i] += uprofiles_reduced[i];
 
   
@@ -899,7 +908,7 @@ int main(int argc, char * argv[])
       std::thread blinded_items_reader(read_blinded_items,  std::ref(io_context), std::ref(sb));
       std::thread blinded_items_generator(generate_blinded_items);    
       std::thread blinded_items_writer(write_blinded_items, 0, std::ref(io_context), std::ref(sb)); 
-      std::thread mux_norm_writer(write_mux_norm, 0, std::ref(io_context), std::ref(sb_a));
+      std::thread mux_norm_writer(write_mux_norm);
   
 
       std::thread blinded_profiles_reader(read_profiles, std::ref(sb_c));
