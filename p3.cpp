@@ -7,6 +7,8 @@
 #include <fstream>
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/bind.hpp>
+#include <boost/asio/ssl.hpp>
 #include<vector>
  
 #include<fstream>
@@ -18,8 +20,12 @@
  #include "dpf.h"
  
 #include "sanitycheck.h"
- 
+ using ssl_socket = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
 using boost::asio::ip::tcp;
+ 
+namespace ssl = boost::asio::ssl;
+typedef ssl::stream<tcp::socket> ssl_socket;
+boost::asio::io_context io_context;
 
 
 
@@ -149,7 +155,7 @@ size_t p3_progress[p3_step::num_steps] = { 0 };
     }
  }
 
-void write_beaver_to_P0(size_t j, boost::asio::io_context& io_context, tcp::socket& sout_seed,  tcp::socket& sout)
+void write_beaver_to_P0(size_t j, boost::asio::io_context& io_context, ssl_socket& sout_seed,  ssl_socket& sout)
 { 
     while( p3_progress[p3_step::beaver_generated] < j + 1) 
     { 
@@ -186,7 +192,7 @@ void write_beaver_to_P0(size_t j, boost::asio::io_context& io_context, tcp::sock
 } 
 
 
-void write_beaver_to_P1(size_t j, boost::asio::io_context& io_context, tcp::socket& sout_seed, tcp::socket& sout)
+void write_beaver_to_P1(size_t j, boost::asio::io_context& io_context, ssl_socket& sout_seed, ssl_socket& sout)
 {
 
     while( p3_progress[p3_step::beaver_generated] < j + 1) 
@@ -223,7 +229,7 @@ void write_beaver_to_P1(size_t j, boost::asio::io_context& io_context, tcp::sock
 }
 
 uint64_t shift[nqueries][2];
-void write_shits_to_P0(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
+void write_shits_to_P0(size_t j, boost::asio::io_context& io_context, ssl_socket & sout)
 {
  
   async_write(sout, boost::asio::buffer(shift[j],  2* sizeof(uint64_t)),
@@ -247,7 +253,7 @@ void write_shits_to_P0(size_t j, boost::asio::io_context& io_context, tcp::socke
     p3_progress[p3_step::shift0_out] = j + 1; 
 }
 
-void write_shits_to_P1(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
+void write_shits_to_P1(size_t j, boost::asio::io_context& io_context, ssl_socket& sout)
 {
  
   async_write(sout, boost::asio::buffer(shift[j],  2* sizeof(uint64_t)),
@@ -303,34 +309,96 @@ int main(int argc, char* argv[])
 
 
 
-  tcp::acceptor acceptor1(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P3));
-  std::cout << " --- > " << std::endl;
-  tcp::socket s1(acceptor1.accept());
+
+
+   boost::asio::ssl::context ssl_context(boost::asio::ssl::context::sslv23); 
+
+ 
+    
+    ssl_context.set_options(
+        boost::asio::ssl::context::default_workarounds
+        | boost::asio::ssl::context::no_sslv2
+        | boost::asio::ssl::context::single_dh_use);
+   //context_.set_password_callback(boost::bind(&server::get_password, this));
+    ssl_context.use_certificate_chain_file("server.crt"); 
+    ssl_context.use_private_key_file("server.key", boost::asio::ssl::context::pem);
+    ssl_context.use_tmp_dh_file("dh512.pem");
+
+    ssl_socket s1(io_context, ssl_context);
+   boost::asio::ip::tcp::endpoint endpoint1(boost::asio::ip::tcp::v4(), PORT_P1_P3);
+   boost::asio::ip::tcp::acceptor acceptor1(io_context, endpoint1);
+   acceptor1.accept(s1.next_layer());
+   s1.handshake(boost::asio::ssl::stream_base::server);
+
+  // tcp::acceptor acceptor1(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P3));
+  // std::cout << " --- > " << std::endl;
+  // tcp::socket s1(acceptor1.accept());
   std::cerr << "Listenting on port: " << PORT_P1_P3 << std::endl;
 
-  tcp::acceptor acceptor1_a(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P3_a));
-  std::cout << " --- > " << std::endl;
-  tcp::socket s1_a(acceptor1_a.accept());
-  std::cerr << "Listenting on port: " << PORT_P1_P3 << std::endl;
 
-  tcp::acceptor acceptor1_b(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P3_b));
-  std::cout << " --- > " << std::endl;
-  tcp::socket s1_b(acceptor1_b.accept());
-  std::cerr << "Listenting on port: " << PORT_P1_P3_b << std::endl;
+    ssl_socket s1_a(io_context, ssl_context);
+   boost::asio::ip::tcp::endpoint endpoint1_a(boost::asio::ip::tcp::v4(), PORT_P1_P3_a);
+   boost::asio::ip::tcp::acceptor acceptor1_a(io_context, endpoint1_a);
+   acceptor1_a.accept(s1_a.next_layer());
+   s1_a.handshake(boost::asio::ssl::stream_base::server);
 
-  tcp::acceptor acceptor0(io_context, tcp::endpoint(tcp::v4(), PORT_P0_P3));
-  std::cout << " --- > " << std::endl;
-  tcp::socket s0(acceptor0.accept());
+
+
+   ssl_socket s1_b(io_context, ssl_context);
+   boost::asio::ip::tcp::endpoint endpoint1_b(boost::asio::ip::tcp::v4(), PORT_P1_P3_b);
+   boost::asio::ip::tcp::acceptor acceptor1_b(io_context, endpoint1_b);
+   acceptor1_b.accept(s1_b.next_layer());
+   s1_b.handshake(boost::asio::ssl::stream_base::server);
+
+  // tcp::acceptor acceptor1_b(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P3_b));
+  // std::cout << " --- > " << std::endl;
+  // tcp::socket s1_b(acceptor1_b.accept());
+  // std::cerr << "Listenting on port: " << PORT_P1_P3_b << std::endl;
+
+
+    ssl_socket s0(io_context, ssl_context);
+   boost::asio::ip::tcp::endpoint endpoint0(boost::asio::ip::tcp::v4(), PORT_P0_P3);
+   boost::asio::ip::tcp::acceptor acceptor0(io_context, endpoint0);
+   acceptor0.accept(s0.next_layer());
+   s0.handshake(boost::asio::ssl::stream_base::server);
+
+  //  boost::asio::ip::tcp::endpoint endpoint0(boost::asio::ip::tcp::v4(), PORT_P0_P3);
+  //  boost::asio::ip::tcp::acceptor acceptor0(io_context, endpoint0);
+  //  ssl_socket s0(io_context, ssl_context);
+  //  acceptor0.accept(s0.next_layer());
+  //  s0.async_handshake(boost::asio::ssl::stream_base::server, [&] (boost::system::error_code error)
+  // {
+  //     // Handshake is done
+  // });
+
+
+  // tcp::acceptor acceptor0(io_context, tcp::endpoint(tcp::v4(), PORT_P0_P3));
+  // std::cout << " --- > " << std::endl;
+  // tcp::socket s0(acceptor0.accept());
   std::cerr << "Listenting on port: " << PORT_P0_P3 << std::endl;
 
-  tcp::acceptor acceptor0_a(io_context, tcp::endpoint(tcp::v4(), PORT_P0_P3_a));
-  std::cout << " --- > " << std::endl;
-  tcp::socket s0_a(acceptor0_a.accept());
+
+   ssl_socket s0_a(io_context, ssl_context);
+   boost::asio::ip::tcp::endpoint endpoint0_a(boost::asio::ip::tcp::v4(), PORT_P0_P3_a);
+   boost::asio::ip::tcp::acceptor acceptor0_a(io_context, endpoint0_a);
+   acceptor0_a.accept(s0_a.next_layer());
+   s0_a.handshake(boost::asio::ssl::stream_base::server);
+
+  // tcp::acceptor acceptor0_a(io_context, tcp::endpoint(tcp::v4(), PORT_P0_P3_a));
+  // std::cout << " --- > " << std::endl;
+  // tcp::socket s0_a(acceptor0_a.accept());
   std::cerr << "Listenting on port: " << PORT_P0_P3_a << std::endl;
 
-   tcp::acceptor acceptor0_b(io_context, tcp::endpoint(tcp::v4(), PORT_P0_P3_b));
-  std::cout << " --- > " << std::endl;
-  tcp::socket s0_b(acceptor0_b.accept());
+   ssl_socket s0_b(io_context, ssl_context);
+   boost::asio::ip::tcp::endpoint endpoint0_b(boost::asio::ip::tcp::v4(), PORT_P0_P3_b);
+   boost::asio::ip::tcp::acceptor acceptor0_b(io_context, endpoint0_b);
+   acceptor0_b.accept(s0_b.next_layer());
+   s0_b.handshake(boost::asio::ssl::stream_base::server);
+
+  // tcp::acceptor acceptor0_b(io_context, tcp::endpoint(tcp::v4(), PORT_P0_P3_b));
+  // std::cout << " --- > " << std::endl;
+  // tcp::socket s0_b(acceptor0_b.accept());
+
   std::cerr << "Listenting on port: " << PORT_P0_P3_b << std::endl;
 
   tcp::socket s2(io_context);

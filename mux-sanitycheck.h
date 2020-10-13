@@ -1,4 +1,4 @@
-void read_sanity_seeds(AES_KEY& prgkey, tcp::socket& sin)
+void read_sanity_seeds(AES_KEY& prgkey, ssl_socket& sin)
 {
   read(sin, boost::asio::buffer(sanity_seeds, 2 * sizeof(__m128i)));
 
@@ -10,21 +10,24 @@ void read_sanity_seeds(AES_KEY& prgkey, tcp::socket& sin)
   progress[step::sanity_seeds_in] = 1;
 }
 
-void read_shifts(tcp::socket& sin)
+void read_shifts(ssl_socket& sin)
 {
   for(size_t j = 0; j < nqueries; ++j)
   {
-    boost::asio::read(sin, boost::asio::buffer(shift[j], 2 * sizeof(uint64_t)));
+    boost::system::error_code ec;
+
+    boost::asio::read(sin, boost::asio::buffer(shift[j], 2 * sizeof(uint64_t)), ec);
     progress[step::shifts_in] = j + 1;
   }
 }
 
 
-void read_mux_verification(tcp::socket& sin)
+void read_mux_verification(ssl_socket & sin)
 {
   for(size_t j = 0; j < nqueries; ++j)
   {
-    boost::asio::read(sin, boost::asio::buffer(&sanity_vector_mux[j], sizeof(int8_t)));
+     boost::system::error_code ec;
+    boost::asio::read(sin, boost::asio::buffer(&sanity_vector_mux[j], sizeof(int8_t)), ec);
     
     if(sanity_vector_mux[j] == 0)
     {
@@ -63,7 +66,7 @@ void read_mux_verification(tcp::socket& sin)
  }
 
  
- void send_dp_to_P2(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
+ void send_dp_to_P2(size_t j, boost::asio::io_context& io_context, ssl_socket& sout)
  {
     while(progress[step::dp_gen] < j + 1)
     {

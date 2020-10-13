@@ -12,7 +12,7 @@ uint64_t U_msb_prod_recv[nusers][DIM];
 
 __m128i u_precision_seed;
 
-void U_read_precision_reduction_bvrs(AES_KEY& prgkey, tcp::socket& sin)
+void U_read_precision_reduction_bvrs(AES_KEY& prgkey, ssl_socket& sin)
 {
 
   read(sin, boost::asio::buffer(&u_precision_seed, sizeof(__m128i))); 

@@ -6,7 +6,7 @@
 /*
   P0 and P1 receive blinds from P3
 */
-void read_mux_bvr(AES_KEY &key,boost::asio::io_context& io_context, tcp::socket & sin_seed, tcp::socket & sin)
+void read_mux_bvr(AES_KEY &key,boost::asio::io_context& io_context, ssl_socket & sin_seed, ssl_socket & sin)
 { 
   
    read(sin_seed, boost::asio::buffer(&seed3, sizeof(__m128i)));
@@ -34,8 +34,8 @@ void read_mux_bvr(AES_KEY &key,boost::asio::io_context& io_context, tcp::socket 
      #ifdef VERBOSE
       std::cout << " (p3 beavers) i = " << i << std::endl;
      #endif  
-     
-     boost::asio::read(sin, boost::asio::buffer(&p3_bvrs[i], p3_beavers::size));
+      boost::system::error_code ec;
+     boost::asio::read(sin, boost::asio::buffer(&p3_bvrs[i], p3_beavers::size), ec);
      
      progress[step::bvr3_in] = i + 1;
    }
@@ -70,10 +70,11 @@ void generate_blinded_items()
 /* 
   P0 and P1 exchange their blinded profiles 
 */
-void write_blinded_items(const size_t i, boost::asio::io_context& io_context, tcp::socket& sout)
+void write_blinded_items(const size_t i, boost::asio::io_context& io_context, ssl_socket & sout)
 {
       while(progress[step::itm_blind_gen] < i + 1)
       { 
+        
         std::this_thread::yield();
       }
       
@@ -109,7 +110,7 @@ void write_blinded_items(const size_t i, boost::asio::io_context& io_context, tc
 /* 
   P0 and P1 exchange their blinded profiles 
 */
-void read_blinded_items(boost::asio::io_context & io_context, tcp::socket & sin)
+void read_blinded_items(boost::asio::io_context & io_context, ssl_socket & sin)
 {
  
    itmBB = (profile<precision> *) std::aligned_alloc(sizeof(__m256i), nitems * sizeof(profile<precision>));
@@ -119,14 +120,15 @@ void read_blinded_items(boost::asio::io_context & io_context, tcp::socket & sin)
       while (progress[step::mux_seed] < 1) 
       {
  
+
          std::this_thread::yield(); 
  
       }
-    
-      read(sin, boost::asio::buffer(&itmBB[i], sizeof(profile<precision>)));
+       boost::system::error_code ec;
+       boost::asio::read(sin, boost::asio::buffer(&itmBB[i], sizeof(profile<precision>)), ec);
        
       itmBB[i] = iprofiles[i] + itmBB[i];
-    
+       
       progress[step::itm_blind_in] = i + 1;
    }
   
@@ -134,7 +136,7 @@ void read_blinded_items(boost::asio::io_context & io_context, tcp::socket & sin)
 
 
 
-void write_mux_norm(size_t i, boost::asio::io_context & io_context, tcp::socket & sout)
+void write_mux_norm()
 {
    
 
@@ -156,6 +158,9 @@ void write_mux_norm(size_t i, boost::asio::io_context & io_context, tcp::socket 
           ) 
 
         {
+
+           // std::cout << progress[step::bvr2_sanity_in] << " " << progress[step::bvr3_in] << " " <<  progress[step::itm_blind_in] << " "
+           //           << progress[step::itm_blind_gen] << " " <<  progress[step::evalfull_done_] << std::endl;
  
           std::this_thread::yield(); 
         }
