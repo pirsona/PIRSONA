@@ -519,7 +519,7 @@ void update_uprofiles()
 }
 
 /* THIS FUNCTION IS ONLY FOR DEBUGGING */
-void write_iprofiles(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
+void write_iprofiles(size_t j, boost::asio::io_context& io_context, ssl_socket& sout)
 {
   while(progress[step::item_update] < nqueries || progress[step::offset_iprofiles] < total_bucket_elements)
   {
@@ -555,7 +555,7 @@ void write_iprofiles(size_t j, boost::asio::io_context& io_context, tcp::socket&
 
 
 /* THIS FUNCTION IS ONLY FOR DEBUGGING */
-void reconstruct_iprofiles(tcp::socket& sin)
+void reconstruct_iprofiles(ssl_socket& sin)
 {
 
  
@@ -583,7 +583,7 @@ void reconstruct_iprofiles(tcp::socket& sin)
 
 
 /* THIS FUNCTION IS ONLY FOR DEBUGGING */
-void write_uprofiles(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
+void write_uprofiles(size_t j, boost::asio::io_context& io_context, ssl_socket& sout)
 {
     while(progress[step::user_update] < nqueries || progress[step::offset_uprofiles] < nusers)
     {
@@ -615,7 +615,7 @@ void write_uprofiles(size_t j, boost::asio::io_context& io_context, tcp::socket&
 }
 
 /* THIS FUNCTION IS ONLY FOR DEBUGGING */
-void reconstruct_uprofiles(tcp::socket& sin)
+void reconstruct_uprofiles(ssl_socket& sin)
 {
 
   uprofiles_reconstructed = (profile<3 * (precision/2)> *)std::aligned_alloc(sizeof(__m256i), nusers * sizeof(profile<3 * (precision/2)>));

@@ -52,7 +52,7 @@ void U_gen_msbs()
 }
 
 
-void write_U_profile_msbs(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
+void write_U_profile_msbs(size_t j, boost::asio::io_context& io_context, ssl_socket& sout)
 {
      while(progress[step::u_msbs_gen] < j + 1)
      {
@@ -82,7 +82,7 @@ void write_U_profile_msbs(size_t j, boost::asio::io_context& io_context, tcp::so
 }
 
 
-void read_U_profile_msbs(tcp::socket& sin)
+void read_U_profile_msbs(ssl_socket& sin)
 {
 
  
@@ -128,7 +128,7 @@ void blind_U_profile_msbs()
   }
 }
 
-void write_blinded_U_profile_msbs(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
+void write_blinded_U_profile_msbs(size_t j, boost::asio::io_context& io_context, ssl_socket& sout)
 {
 
     while(progress[step::u_profile_msbs_blinded] < j + 1)
@@ -160,7 +160,7 @@ void write_blinded_U_profile_msbs(size_t j, boost::asio::io_context& io_context,
 
 
 
-void read_blinded_U_profile_msbs(tcp::socket& sin)
+void read_blinded_U_profile_msbs(ssl_socket& sin)
 {
   for(size_t j = 0; j < nusers; ++j)
   {
@@ -200,7 +200,7 @@ void U_gen_msb_prod()
 }
 
 
-void U_write_msb_prod(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
+void U_write_msb_prod(size_t j, boost::asio::io_context& io_context, ssl_socket& sout)
 {
 
   while(progress[step::u_msb_prod_gen] < j + 1)
@@ -231,7 +231,7 @@ void U_write_msb_prod(size_t j, boost::asio::io_context& io_context, tcp::socket
         });  
 }
 
-void U_read_msb_prod(tcp::socket& sin)
+void U_read_msb_prod(ssl_socket& sin)
 {
   for(size_t j = 0; j < nusers; ++j)
   {

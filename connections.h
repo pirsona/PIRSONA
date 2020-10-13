@@ -265,64 +265,125 @@
     std::cout << "P0: [Established connection P1 (6)]" << std::endl;
     usleep(20000);
 
-    tcp::socket sb_f(io_context);
-    boost::asio::connect(sb_f, resolver.resolve({host1,
-    std::to_string(PORT_P1_P0_f)}));
+    ssl_socket sb_f(io_context, ssl_contextb);
+    sb_f.set_verify_mode(boost::asio::ssl::verify_peer);
+    auto endpointsb_f = resolver.resolve(host1, std::to_string(PORT_P1_P0_f));
+    boost::asio::connect(sb_f.lowest_layer(), endpointsb_f);
+    sb_f.handshake(boost::asio::ssl::stream_base::client);
+
+
+    // tcp::socket sb_f(io_context);
+    // boost::asio::connect(sb_f, resolver.resolve({host1,
+    // std::to_string(PORT_P1_P0_f)}));
     std::cout << "P0: [Established connection P1 (7)]" << std::endl;
     usleep(20000);
+    ssl_socket sb_g(io_context, ssl_contextb);
+    sb_g.set_verify_mode(boost::asio::ssl::verify_peer);
+    auto endpointsb_g = resolver.resolve(host1, std::to_string(PORT_P1_P0_g));
+    boost::asio::connect(sb_g.lowest_layer(), endpointsb_g);
+    sb_g.handshake(boost::asio::ssl::stream_base::client);
 
-    tcp::socket sb_g(io_context);
-    boost::asio::connect(sb_g, resolver.resolve({host1,
-    std::to_string(PORT_P1_P0_g)}));
+    // tcp::socket sb_g(io_context);
+    // boost::asio::connect(sb_g, resolver.resolve({host1,
+    // std::to_string(PORT_P1_P0_g)}));
     std::cout << "P0: [Established connection P1 (8)]" << std::endl;
     usleep(20000);
 
-    tcp::socket sb_h(io_context);
-    boost::asio::connect(sb_h, resolver.resolve({host1,
-    std::to_string(PORT_P1_P0_h)}));
+    ssl_socket sb_h(io_context, ssl_contextb);
+    sb_h.set_verify_mode(boost::asio::ssl::verify_peer);
+    auto endpointsb_h = resolver.resolve(host1, std::to_string(PORT_P1_P0_h));
+    boost::asio::connect(sb_h.lowest_layer(), endpointsb_h);
+    sb_h.handshake(boost::asio::ssl::stream_base::client);
+
+
+    // tcp::socket sb_h(io_context);
+    // boost::asio::connect(sb_h, resolver.resolve({host1,
+    // std::to_string(PORT_P1_P0_h)}));
     std::cout << "P0: [Established connection P1 (9)]" << std::endl;
     usleep(20000);
 
-    tcp::socket sb_i(io_context);
-    boost::asio::connect(sb_i, resolver.resolve({host1,
-    std::to_string(PORT_P1_P0_i)}));
+
+    ssl_socket sb_i(io_context, ssl_contextb);
+    sb_i.set_verify_mode(boost::asio::ssl::verify_peer);
+    auto endpointsb_i = resolver.resolve(host1, std::to_string(PORT_P1_P0_i));
+    boost::asio::connect(sb_i.lowest_layer(), endpointsb_i);
+    sb_i.handshake(boost::asio::ssl::stream_base::client);
+
+    // tcp::socket sb_i(io_context);
+    // boost::asio::connect(sb_i, resolver.resolve({host1,
+    // std::to_string(PORT_P1_P0_i)}));
     std::cout << "P0: [Established connection P1 (9)]" << std::endl;
     usleep(20000);
 
  
-    tcp::socket sb_j(io_context);
-    boost::asio::connect(sb_j, resolver.resolve({host1,
-    std::to_string(PORT_P1_P0_j)}));
+    ssl_socket sb_j(io_context, ssl_contextb);
+    sb_j.set_verify_mode(boost::asio::ssl::verify_peer);
+    auto endpointsb_j = resolver.resolve(host1, std::to_string(PORT_P1_P0_j));
+    boost::asio::connect(sb_j.lowest_layer(), endpointsb_j);
+    sb_j.handshake(boost::asio::ssl::stream_base::client);
+
+    // tcp::socket sb_j(io_context);
+    // boost::asio::connect(sb_j, resolver.resolve({host1,
+    // std::to_string(PORT_P1_P0_j)}));
     std::cout << "P0: [Established connection P1 (9)]" << std::endl;
     usleep(20000);
 
-    tcp::socket sb_k(io_context);
-    boost::asio::connect(sb_k, resolver.resolve({host1,
-    std::to_string(PORT_P1_P0_k)}));
+    ssl_socket sb_k(io_context, ssl_contextb);
+    sb_k.set_verify_mode(boost::asio::ssl::verify_peer);
+    auto endpointsb_k = resolver.resolve(host1, std::to_string(PORT_P1_P0_k));
+    boost::asio::connect(sb_k.lowest_layer(), endpointsb_k);
+    sb_k.handshake(boost::asio::ssl::stream_base::client);
+
+    // tcp::socket sb_k(io_context);
+    // boost::asio::connect(sb_k, resolver.resolve({host1,
+    // std::to_string(PORT_P1_P0_k)}));
     std::cout << "P0: [Established connection P1 (9)]" << std::endl;
     usleep(20000);
 
-    tcp::socket sb_l(io_context);
-    boost::asio::connect(sb_l, resolver.resolve({host1,
-    std::to_string(PORT_P1_P0_l)}));
+    ssl_socket sb_l(io_context, ssl_contextb);
+    sb_l.set_verify_mode(boost::asio::ssl::verify_peer);
+    auto endpointsb_l = resolver.resolve(host1, std::to_string(PORT_P1_P0_l));
+    boost::asio::connect(sb_l.lowest_layer(), endpointsb_l);
+    sb_l.handshake(boost::asio::ssl::stream_base::client);
+    // tcp::socket sb_l(io_context);
+    // boost::asio::connect(sb_l, resolver.resolve({host1,
+    // std::to_string(PORT_P1_P0_l)}));
     std::cout << "P0: [Established connection P1 (9)]" << std::endl;
     usleep(20000);
 
-    tcp::socket sb_m(io_context);
-    boost::asio::connect(sb_m, resolver.resolve({host1,
-    std::to_string(PORT_P1_P0_m)}));
+    ssl_socket sb_m(io_context, ssl_contextb);
+    sb_m.set_verify_mode(boost::asio::ssl::verify_peer);
+    auto endpointsb_m = resolver.resolve(host1, std::to_string(PORT_P1_P0_m));
+    boost::asio::connect(sb_m.lowest_layer(), endpointsb_m);
+    sb_m.handshake(boost::asio::ssl::stream_base::client);
+    // tcp::socket sb_m(io_context);
+    // boost::asio::connect(sb_m, resolver.resolve({host1,
+    // std::to_string(PORT_P1_P0_m)}));
     std::cout << "P0: [Established connection P1 (9)]" << std::endl;
     usleep(20000);
 
-    tcp::socket sb_n(io_context);
-    boost::asio::connect(sb_n, resolver.resolve({host1,
-    std::to_string(PORT_P1_P0_n)}));
+
+    ssl_socket sb_n(io_context, ssl_contextb);
+    sb_n.set_verify_mode(boost::asio::ssl::verify_peer);
+    auto endpointsb_n = resolver.resolve(host1, std::to_string(PORT_P1_P0_n));
+    boost::asio::connect(sb_n.lowest_layer(), endpointsb_n);
+    sb_n.handshake(boost::asio::ssl::stream_base::client);
+
+    // tcp::socket sb_n(io_context);
+    // boost::asio::connect(sb_n, resolver.resolve({host1,
+    // std::to_string(PORT_P1_P0_n)}));
     std::cout << "P0: [Established connection P1 (9)]" << std::endl;
     usleep(20000);
 
-    tcp::socket sb_o(io_context);
-    boost::asio::connect(sb_o, resolver.resolve({host1,
-    std::to_string(PORT_P1_P0_o)}));
+    ssl_socket sb_o(io_context, ssl_contextb);
+    sb_o.set_verify_mode(boost::asio::ssl::verify_peer);
+    auto endpointsb_o = resolver.resolve(host1, std::to_string(PORT_P1_P0_o));
+    boost::asio::connect(sb_o.lowest_layer(), endpointsb_o);
+    sb_o.handshake(boost::asio::ssl::stream_base::client);
+
+    // tcp::socket sb_o(io_context);
+    // boost::asio::connect(sb_o, resolver.resolve({host1,
+    // std::to_string(PORT_P1_P0_o)}));
     std::cout << "P0: [Established connection P1 (9)]" << std::endl;
     usleep(20000);
 
@@ -595,69 +656,116 @@
     // tcp::socket sb_e(acceptor_e.accept());
     // std::cerr << "Listenting on port: " << PORT_P1_P0_e << std::endl;
 
+    ssl_socket sb_f(io_context, ssl_contextb);
+    boost::asio::ip::tcp::endpoint endpointb_f(boost::asio::ip::tcp::v4(), PORT_P1_P0_f);
+    boost::asio::ip::tcp::acceptor acceptorb_f(io_context, endpointb_f);
+    acceptorb_f.accept(sb_f.next_layer());
+    sb_f.handshake(boost::asio::ssl::stream_base::server);
 
-
-    tcp::acceptor acceptor_f(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_f));
-    std::cout << " --- > " << std::endl;
-    tcp::socket sb_f(acceptor_f.accept());
+    // tcp::acceptor acceptor_f(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_f));
+    // std::cout << " --- > " << std::endl;
+    // tcp::socket sb_f(acceptor_f.accept());
     std::cerr << "Listenting on port: " << PORT_P1_P0_f << std::endl;
 
-    tcp::acceptor acceptor_g(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_g));
-    std::cout << " --- > " << std::endl;
-    tcp::socket sb_g(acceptor_g.accept());
+    ssl_socket sb_g(io_context, ssl_contextb);
+    boost::asio::ip::tcp::endpoint endpointb_g(boost::asio::ip::tcp::v4(), PORT_P1_P0_g);
+    boost::asio::ip::tcp::acceptor acceptorb_g(io_context, endpointb_g);
+    acceptorb_g.accept(sb_g.next_layer());
+    sb_g.handshake(boost::asio::ssl::stream_base::server);
+
+    // tcp::acceptor acceptor_g(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_g));
+    // std::cout << " --- > " << std::endl;
+    // tcp::socket sb_g(acceptor_g.accept());
     std::cerr << "Listenting on port: " << PORT_P1_P0_g << std::endl;
 
-    tcp::acceptor acceptor_h(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_h));
-    std::cout << " --- > " << std::endl;
-    tcp::socket sb_h(acceptor_h.accept());
+
+    ssl_socket sb_h(io_context, ssl_contextb);
+    boost::asio::ip::tcp::endpoint endpointb_h(boost::asio::ip::tcp::v4(), PORT_P1_P0_h);
+    boost::asio::ip::tcp::acceptor acceptorb_h(io_context, endpointb_h);
+    acceptorb_h.accept(sb_h.next_layer());
+    sb_h.handshake(boost::asio::ssl::stream_base::server);
+
+    // tcp::acceptor acceptor_h(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_h));
+    // std::cout << " --- > " << std::endl;
+    // tcp::socket sb_h(acceptor_h.accept());
     std::cerr << "Listenting on port: " << PORT_P1_P0_h << std::endl;
 
-    tcp::acceptor acceptor_i(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_i));
-    std::cout << " --- > " << std::endl;
-    tcp::socket sb_i(acceptor_i.accept());
+
+    ssl_socket sb_i(io_context, ssl_contextb);
+    boost::asio::ip::tcp::endpoint endpointb_i(boost::asio::ip::tcp::v4(), PORT_P1_P0_i);
+    boost::asio::ip::tcp::acceptor acceptorb_i(io_context, endpointb_i);
+    acceptorb_i.accept(sb_i.next_layer());
+    sb_i.handshake(boost::asio::ssl::stream_base::server);
+
+    // tcp::acceptor acceptor_i(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_i));
+    // std::cout << " --- > " << std::endl;
+    // tcp::socket sb_i(acceptor_i.accept());
     std::cerr << "Listenting on port: " << PORT_P1_P0_i << std::endl;
 
-    // boost::asio::ip::tcp::endpoint endpoint_j(boost::asio::ip::tcp::v4(), PORT_P1_P0_j);
-    // boost::asio::ip::tcp::acceptor acceptor_j(io_context, endpoint_j);
-    // ssl_socket sb_j(io_context, ssl_context);
-    // acceptor_j.accept(sb_j.next_layer());
-    //     sb_j.async_handshake(boost::asio::ssl::stream_base::server, [&] (boost::system::error_code error)
-    // {
-    //     std::cerr << "handshake done\n";
-    // // Handshake is done
-    // });
+    ssl_socket sb_j(io_context, ssl_contextb);
+    boost::asio::ip::tcp::endpoint endpointb_j(boost::asio::ip::tcp::v4(), PORT_P1_P0_j);
+    boost::asio::ip::tcp::acceptor acceptorb_j(io_context, endpointb_j);
+    acceptorb_j.accept(sb_j.next_layer());
+    sb_j.handshake(boost::asio::ssl::stream_base::server);
 
-    tcp::acceptor acceptor_j(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_j));
-    std::cout << " --- > " << std::endl;
-    tcp::socket sb_j(acceptor_j.accept());
+    // tcp::acceptor acceptor_j(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_j));
+    // std::cout << " --- > " << std::endl;
+    // tcp::socket sb_j(acceptor_j.accept());
     std::cerr << "Listenting on port: " << PORT_P1_P0_j << std::endl;
 
-    tcp::acceptor acceptor_k(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_k));
-    std::cout << " --- > " << std::endl;
-    tcp::socket sb_k(acceptor_k.accept());
+    ssl_socket sb_k(io_context, ssl_contextb);
+    boost::asio::ip::tcp::endpoint endpointb_k(boost::asio::ip::tcp::v4(), PORT_P1_P0_k);
+    boost::asio::ip::tcp::acceptor acceptorb_k(io_context, endpointb_k);
+    acceptorb_k.accept(sb_k.next_layer());
+    sb_k.handshake(boost::asio::ssl::stream_base::server);
+
+    // tcp::acceptor acceptor_k(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_k));
+    // std::cout << " --- > " << std::endl;
+    // tcp::socket sb_k(acceptor_k.accept());
     std::cerr << "Listenting on port: " << PORT_P1_P0_k << std::endl;
 
-    tcp::acceptor acceptor_l(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_l));
-    std::cout << " --- > " << std::endl;
-    tcp::socket sb_l(acceptor_l.accept());
+    ssl_socket sb_l(io_context, ssl_contextb);
+    boost::asio::ip::tcp::endpoint endpointb_l(boost::asio::ip::tcp::v4(), PORT_P1_P0_l);
+    boost::asio::ip::tcp::acceptor acceptorb_l(io_context, endpointb_l);
+    acceptorb_l.accept(sb_l.next_layer());
+    sb_l.handshake(boost::asio::ssl::stream_base::server);
+
+    // tcp::acceptor acceptor_l(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_l));
+    // std::cout << " --- > " << std::endl;
+    // tcp::socket sb_l(acceptor_l.accept());
     std::cerr << "Listenting on port: " << PORT_P1_P0_l << std::endl;
+    
+    ssl_socket sb_m(io_context, ssl_contextb);
+    boost::asio::ip::tcp::endpoint endpointb_m(boost::asio::ip::tcp::v4(), PORT_P1_P0_m);
+    boost::asio::ip::tcp::acceptor acceptorb_m(io_context, endpointb_m);
+    acceptorb_m.accept(sb_m.next_layer());
+    sb_m.handshake(boost::asio::ssl::stream_base::server);
 
-
-    tcp::acceptor acceptor_m(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_m));
-    std::cout << " --- > " << std::endl;
-    tcp::socket sb_m(acceptor_m.accept());
+    // tcp::acceptor acceptor_m(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_m));
+    // std::cout << " --- > " << std::endl;
+    // tcp::socket sb_m(acceptor_m.accept());
     std::cerr << "Listenting on port: " << PORT_P1_P0_m << std::endl;
+    
+    ssl_socket sb_n(io_context, ssl_contextb);
+    boost::asio::ip::tcp::endpoint endpointb_n(boost::asio::ip::tcp::v4(), PORT_P1_P0_n);
+    boost::asio::ip::tcp::acceptor acceptorb_n(io_context, endpointb_n);
+    acceptorb_n.accept(sb_n.next_layer());
+    sb_n.handshake(boost::asio::ssl::stream_base::server);
 
-
-    tcp::acceptor acceptor_n(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_n));
-    std::cout << " --- > " << std::endl;
-    tcp::socket sb_n(acceptor_n.accept());
+    // tcp::acceptor acceptor_n(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_n));
+    // std::cout << " --- > " << std::endl;
+    // tcp::socket sb_n(acceptor_n.accept());
     std::cerr << "Listenting on port: " << PORT_P1_P0_n << std::endl;
 
+    ssl_socket sb_o(io_context, ssl_contextb);
+    boost::asio::ip::tcp::endpoint endpointb_o(boost::asio::ip::tcp::v4(), PORT_P1_P0_o);
+    boost::asio::ip::tcp::acceptor acceptorb_o(io_context, endpointb_o);
+    acceptorb_o.accept(sb_o.next_layer());
+    sb_o.handshake(boost::asio::ssl::stream_base::server);
 
-    tcp::acceptor acceptor_o(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_o));
-    std::cout << " --- > " << std::endl;
-    tcp::socket sb_o(acceptor_o.accept());
+    // tcp::acceptor acceptor_o(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_o));
+    // std::cout << " --- > " << std::endl;
+    // tcp::socket sb_o(acceptor_o.accept());
     std::cerr << "Listenting on port: " << PORT_P1_P0_o << std::endl;
 
     tcp::acceptor acceptor_p(io_context, tcp::endpoint(tcp::v4(), PORT_P1_P0_p));

@@ -19,7 +19,7 @@ uint64_t msb_prod_recv[total_bucket_elements][DIM];
 __m128i I_precision_seed;
 
 
-void write_I_profile_msbs(size_t j, boost::asio::io_context& io_context, tcp::socket & sout)
+void write_I_profile_msbs(size_t j, boost::asio::io_context& io_context, ssl_socket & sout)
 {
      while(progress[step::i_msb_in] < j + 1)
      {
@@ -52,7 +52,7 @@ void write_I_profile_msbs(size_t j, boost::asio::io_context& io_context, tcp::so
 }
 
 
-void read_I_profile_msbs(tcp::socket & sin)
+void read_I_profile_msbs(ssl_socket & sin)
 {
   
   std::cerr << "reading\n";
@@ -121,7 +121,7 @@ void blind_I_profile_msbs()
   }
 }
 
-void write_blinded_I_profile_msbs(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
+void write_blinded_I_profile_msbs(size_t j, boost::asio::io_context& io_context, ssl_socket& sout)
 {
 
     while(progress[step::i_profile_msbs_blinded] < j + 1)
@@ -150,7 +150,7 @@ void write_blinded_I_profile_msbs(size_t j, boost::asio::io_context& io_context,
 }
 
 
-void read_blinded_I_profile_msbs(tcp::socket& sin)
+void read_blinded_I_profile_msbs(ssl_socket& sin)
 {
   for(size_t j = 0; j < total_bucket_elements; ++j)
   {
@@ -195,7 +195,7 @@ void gen_msb_prod()
 }
 
 
-void write_msb_prod(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
+void write_msb_prod(size_t j, boost::asio::io_context& io_context, ssl_socket& sout)
 {
 
   while(progress[step::msb_prod_gen] < j + 1)
@@ -226,7 +226,7 @@ void write_msb_prod(size_t j, boost::asio::io_context& io_context, tcp::socket& 
         });  
 }
 
-void read_msb_prod(tcp::socket& sin)
+void read_msb_prod(ssl_socket& sin)
 {
   for(size_t j = 0; j < total_bucket_elements; ++j)
   {

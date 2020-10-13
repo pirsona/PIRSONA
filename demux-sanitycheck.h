@@ -43,7 +43,7 @@ void demux_sanity_check(AES_KEY& prgkey)
 }
 
 
- void write_demux_sanity_dp(size_t j, boost::asio::io_context& io_context, tcp::socket& sout)
+ void write_demux_sanity_dp(size_t j, boost::asio::io_context& io_context, ssl_socket& sout)
  {
     while(progress[step::demux_sanity_gen] < j + 1)
     {
@@ -70,7 +70,7 @@ void demux_sanity_check(AES_KEY& prgkey)
 
  }
 
- void read_demux_sanity_dp(tcp::socket& sin)
+ void read_demux_sanity_dp(ssl_socket& sin)
  {
    // dp_sanity_recv = (uint64_t *) std::aligned_alloc(sizeof(__m256i), nqueries * sizeof(uint64_t ));
    //uint64_t dp_sanity_recv;
